@@ -90,6 +90,12 @@ public:
 	{
 		CBoundingBox res;
 		// --- PUT YOUR CODE HERE ---
+
+		for (auto pPrim : m_vpPrims) 
+		{
+			res = res.extend(pPrim->calcBounds());
+
+		}
 		return res;
 	}
 	/**

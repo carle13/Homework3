@@ -66,6 +66,10 @@ public:
 	{
 		CBoundingBox res;
 		// --- PUT YOUR CODE HERE ---
+
+		res.extend(m_center[0] - m_radius, m_center[1] - m_radius, m_center[2] - m_radius);
+		res.extend(m_center[0] + m_radius, m_center[1] + m_radius, m_center[2] + m_radius);
+
 		return res;
 	}
 	

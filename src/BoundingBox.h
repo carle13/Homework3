@@ -32,6 +32,14 @@ public:
 	void clear(void)
 	{
 		// --- PUT YOUR CODE HERE ---
+
+		m_max[0] = -std::numeric_limits<float>::infinity();
+		m_max[1] = -std::numeric_limits<float>::infinity();
+		m_max[2] = -std::numeric_limits<float>::infinity();
+		m_min[0] = std::numeric_limits<float>::infinity();
+		m_min[1] = std::numeric_limits<float>::infinity();
+		m_min[2] = std::numeric_limits<float>::infinity();
+
 	}
 	
 	/**
@@ -41,6 +49,9 @@ public:
 	void extend(Vec3f a)
 	{
 		// --- PUT YOUR CODE HERE ---
+
+		m_max = Max3f(m_max, a);
+		m_min = Min3f(m_min, a);
 	}
 	
 	/**
@@ -50,6 +61,9 @@ public:
 	void extend(const CBoundingBox& box)
 	{
 		// --- PUT YOUR CODE HERE ---
+
+		this->extend(box.m_max);
+		this->extend(box.m_min);
 	}
 	
 	/**
@@ -59,7 +73,14 @@ public:
 	bool overlaps(const CBoundingBox& box)
 	{
 		// --- PUT YOUR CODE HERE ---
-		return true;
+		
+		bool olapx = box.m_min[0] <= this->m_max[0] && this->m_min[0] <= box.m_max[0];
+		bool olapy = box.m_min[1] <= this->m_max[1] && this->m_min[1] <= box.m_max[1];
+		bool olapz = box.m_min[2] <= this->m_max[2] && this->m_min[2] <= box.m_max[2];
+		
+		bool result = olapx && olapy && olapz;
+		return result;
+	
 	}
 	
 	/**
@@ -71,6 +92,50 @@ public:
 	void clip(const Ray& ray, float& t0, float& t1)
 	{
 		// --- PUT YOUR CODE HERE ---
+
+		Vec3f tt0;
+		Vec3f tt1;
+
+		
+		for (int i = 0; i < 3; i++) 
+		{
+			if (ray.dir[i] == 0) 
+			{
+				if ((ray.org[i] < this->m_min[i]) || (ray.org[i] > this->m_max[i])) 
+				{
+					t0 = std::numeric_limits<float>::infinity();
+					t1 = std::numeric_limits<float>::infinity();
+					return;
+				}
+			}
+			else 
+			{
+				tt0[i] = (this->m_min[i] - ray.org[i]) / ray.dir[i];
+				tt1[i] = (this->m_max[i] - ray.org[i]) / ray.dir[i];
+				if (tt0[i] > tt1[i]) 
+				{
+					Vec3f swap;
+					swap = tt1;
+					tt1 = tt0;
+					tt0 = swap;
+				}
+				if (tt0[i] > -1 * std::numeric_limits<float>::infinity()) 
+				{
+					-1 * std::numeric_limits<float>::infinity() = tt0[i];
+				}
+				if (tt1[i] < std::numeric_limits<float>::infinity()) 
+				{
+					std::numeric_limits<float>::infinity() = tt1[i];
+				}
+				if ((-1 * std::numeric_limits<float>::infinity() > std::numeric_limits<float>::infinity()) || (std::numeric_limits<float>::infinity() < 0)) {
+					t0 = std::numeric_limits<float>::infinity();
+					t1 = std::numeric_limits<float>::infinity();
+					return;
+				}
+			}
+		}
+		t0 = -1 * std::numeric_limits<float>::infinity();
+		t1 = std::numeric_limits<float>::infinity();
 	}
 	
 	
